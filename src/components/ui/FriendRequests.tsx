@@ -1,0 +1,62 @@
+'use client'
+
+import { X } from 'lucide-react'
+import { Check } from 'lucide-react'
+import Image from 'next/image'
+import { FC, useState } from 'react'
+
+interface FriendRequestsProps {
+  incomingFriendRequests: IncomingFriendRequest[]
+  sessionId: string
+}
+
+const FriendRequests: FC<FriendRequestsProps> = ({
+  incomingFriendRequests,
+  sessionId
+}) => {
+  const [friendRequests, setFriendRequests] = useState<IncomingFriendRequest[]>(
+    incomingFriendRequests
+  )
+  console.log({ incomingFriendRequests })
+  return (
+    <>
+      {friendRequests.length === 0 ? (
+        <p className='text-sm text-zinc-500 '>Nothing to show here 😓</p>
+      ) : (
+        friendRequests.map((request) => {
+          return (
+            <div key={request.senderId} className='flex gap-4 items-center border rounded-lg p-2'>
+              <div className='relative rounded-full h-10 w-10'>
+                <Image
+                  src={request.senderPicture}
+                  alt={`${request.senderName} profile picture`}
+                  fill
+                  referrerPolicy='no-referrer'
+                  className='rounded-full '
+                />
+              </div>
+              <div className='flex flex-col '>
+                <p className='font-medium text-lg'>{request.senderName}</p>
+
+                <p className='font-medium text-xs text-gray-500'>{request.senderEmail}</p>
+              </div>
+              <button
+                aria-label='accept friend'
+                className='w-8 h-8 bg-indigo-600 hover:bg-indigo-700 grid place-items-center rounded-full transition-all hover:shadow-medium'>
+                <Check className='font-semibold text-white w-3/4 h-3/4' />
+              </button>
+
+              <button
+                aria-label='reject friend'
+                className='w-8 h-8 bg-zinc-600 hover:bg-zinc-700 grid place-items-center rounded-full transition-all hover:shadow-medium'>
+                <X className='font-semibold text-white w-3/4 h-3/4' />
+              </button>
+            </div>
+          )
+        })
+      )}
+    </>
+  )
+}
+
+export default FriendRequests
