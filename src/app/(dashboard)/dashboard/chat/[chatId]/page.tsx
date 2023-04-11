@@ -7,8 +7,8 @@ import { getServerSession } from 'next-auth'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { FC } from 'react'
-import Messages
- from '@/components/ui/Messages'
+import Messages from '@/components/ui/Messages'
+import ChatInput from '@/components/ui/ChatInput'
 interface ChatWithIdPageProps {
   params: {
     chatId: string
@@ -31,9 +31,10 @@ async function getChatMessages(chatId: string) {
     return messages
 
     //TODO display messages in reverse order
+
   } catch (error) {
-    notFound()
     console.log(error)
+    notFound()
   }
 }
 
@@ -79,7 +80,8 @@ const ChatWithIdPage = async ({ params }: ChatWithIdPageProps) => {
           </div>
         </div>
       </div>
-      <Messages />
+      <Messages initialMessages={initialMessages} sessionId={session.user.id} />
+      <ChatInput chatPartner={chatPartner} chatId={chatId}/>
     </div>
   )
 }
