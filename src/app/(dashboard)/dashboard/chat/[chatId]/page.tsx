@@ -31,7 +31,6 @@ async function getChatMessages(chatId: string) {
     return messages
 
     //TODO display messages in reverse order
-
   } catch (error) {
     console.log(error)
     notFound()
@@ -80,8 +79,15 @@ const ChatWithIdPage = async ({ params }: ChatWithIdPageProps) => {
           </div>
         </div>
       </div>
-      <Messages initialMessages={initialMessages} sessionId={session.user.id} />
-      <ChatInput chatPartner={chatPartner} chatId={chatId}/>
+      <Messages
+        initialMessages={initialMessages}
+        sessionId={session.user.id}
+        chatPartner={chatPartner}
+        sessionImg={session.user.image}
+        sessionName={session.user.name}
+        chatId={chatId}
+      />
+      <ChatInput chatPartner={chatPartner} chatId={chatId} />
     </div>
   )
 }

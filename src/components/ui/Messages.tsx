@@ -1,21 +1,49 @@
 'use client'
 
-import { classNames } from '@/lib/utils'
+import { classNames, toPusherKey } from '@/lib/utils'
 import { Message } from '@/lib/validations/messages'
-import { FC, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { format } from 'date-fns'
+import Image from 'next/image'
+import { User } from '@/types/db'
+import { pusherClient } from '@/lib/pusher'
 interface MessagesProps {
   initialMessages: Message[]
   sessionId: string
+  sessionName: string | null | undefined
+  sessionImg: string | null | undefined
+  chatPartner: User
+  chatId: string
 }
 
-const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
+const Messages: FC<MessagesProps> = ({
+  initialMessages,
+  sessionId,
+  sessionName,
+  sessionImg,
+  chatPartner,
+  chatId
+}) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
 
   const formatTimestamp = (timestamp: number) => {
-    return format(timestamp, 'HH:mm')
+    return format(timestamp, 'hh:mm aaa')
   }
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`chat:${chatId}`))
+
+    const messageHandler = (message: Message) => {
+      setMessages((prev) => [message, ...prev])
+    }
+
+    pusherClient.bind('incoming_message', messageHandler)
+    return () => {
+      pusherClient.unsubscribe(toPusherKey(`chat:${chatId}`))
+      pusherClient.unbind('incoming_message', messageHandler)
+    }
+  }, [])
 
   return (
     <div
@@ -55,10 +83,34 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
                       !hasNextMessageFromSameUser && !isCurrentUser
                   })}>
                   {message.text}{' '}
-                  <span className='ml-2 text-xs text-gray-400'>
+                  <span
+                    className={classNames('ml-2 text-xs', {
+                      'text-gray-400': !isCurrentUser,
+                      'text-white': isCurrentUser
+                    })}>
                     {formatTimestamp(message.timestamp)}
                   </span>
                 </span>
+              </div>
+              <div
+                className={classNames('relative w-6 h-6', {
+                  'order-2': isCurrentUser,
+                  'order-1': !isCurrentUser,
+                  invisible: hasNextMessageFromSameUser
+                })}>
+                <Image
+                  fill
+                  src={
+                    isCurrentUser ? (sessionImg as string) : chatPartner.image
+                  }
+                  alt={
+                    isCurrentUser
+                      ? `${sessionName} profile picture`
+                      : `${chatPartner.name} profile picture`
+                  }
+                  className='rounded-full'
+                  referrerPolicy='no-referrer'
+                />
               </div>
             </div>
           </div>
