@@ -43,7 +43,9 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
-              sendMessage()
+              if (!isLoading) {
+                sendMessage()
+              }
             }
           }}
           rows={1}

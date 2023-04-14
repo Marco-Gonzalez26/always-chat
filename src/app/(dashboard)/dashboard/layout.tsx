@@ -1,26 +1,24 @@
-import { ReactNode } from 'react'
-import { User, getServerSession } from 'next-auth'
-import Image from 'next/image'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
 
-import { Icons, Icon } from '@/components/icons/Icons'
-import SignOutButton from '@/components/ui/SignOutButton'
+import { ReactNode } from 'react'
 import { authOptions } from '@/lib/auth'
-import FriendRequestSidebarOption from '@/components/ui/FriendRequestSidebarOption'
 import { fetchRedis } from '@/helpers/redis'
 import { getFriendsByUserId } from '@/helpers/get-friends-by-user-id'
+import { Icons } from '@/components/icons/Icons'
+import { notFound } from 'next/navigation'
+import { SidebarOption } from '@/types/typings'
+import { getServerSession } from 'next-auth'
+import FriendRequestSidebarOption from '@/components/ui/FriendRequestSidebarOption'
+import Image from 'next/image'
+import Link from 'next/link'
+import MobileChatLayout from '@/components/ui/MobileChatLayout'
 import SidebarChatList from '@/components/ui/SidebarChatList'
+import SignOutButton from '@/components/ui/SignOutButton'
+import { User } from '@/types/db'
 
 interface LayoutProps {
   children: ReactNode
 }
-interface SidebarOption {
-  id: number
-  name: string
-  href: string
-  Icon: Icon
-}
+
 
 const sideBarOptions: SidebarOption[] = [
   {
@@ -33,21 +31,29 @@ const sideBarOptions: SidebarOption[] = [
 
 const Layout = async ({ children }: LayoutProps) => {
   const session = await getServerSession(authOptions)
-
+  
   if (!session) notFound()
 
   const friends = await getFriendsByUserId(session.user.id)
-
+  
   const unseenRequestCount = (
     (await fetchRedis(
       'smembers',
       `user:${session.user.id}:incoming_friend_requests`
     )) as User[]
   ).length
-
   return (
     <div className='w-full flex h-screen'>
-      <div className='flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6'>
+      <div className='md:hidden'>
+        <MobileChatLayout
+          friends={friends}
+          unseenRequestCount={unseenRequestCount}
+          session={session}
+          sideBarOptions={sideBarOptions}
+
+        />
+      </div>
+      <div className='hidden md:flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6'>
         <Link href='/dashboard' className='flex h-16 shrink-0 items-center'>
           <Icons.Logo className='h-8 w-auto text-indigo-600' />
           <p className='m-2 text-md font-semibold'>Always Chat</p>
@@ -120,9 +126,8 @@ const Layout = async ({ children }: LayoutProps) => {
           </ul>
         </nav>
       </div>
-      <aside className='max-h-screen container py-8 md:py-6 w-full'>
-
-      {children}
+      <aside className='max-h-screen container py-16 md:py-8 w-full'>
+        {children}
       </aside>
     </div>
   )
