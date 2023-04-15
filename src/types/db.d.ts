@@ -16,6 +16,7 @@ export interface Message {
   receiverId: string
   text: string
   timestamp: number
+  image?: string
 }
 
 interface FriendRequest {

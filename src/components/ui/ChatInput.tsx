@@ -1,11 +1,14 @@
 'use client'
 
 import { User } from '@/types/db'
-import { FC, useRef, useState } from 'react'
+import { ChangeEvent, FC, useRef, useState } from 'react'
 import TextAreaAutosize from 'react-textarea-autosize'
 import Button from './Button'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
+import { ImagePlus, Send } from 'lucide-react'
+import Modal from './Modal'
+import { reader } from '../../helpers/utils'
 
 interface ChatInputProps {
   chatPartner: User
@@ -15,18 +18,22 @@ interface ChatInputProps {
 const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   const [input, setInput] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
+  const [imageUrl, setImageUrl] = useState<any>('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const sendMessage = async () => {
     setIsLoading(true)
 
-    if (!input) {
+    if (!input && !imageUrl) {
       setIsLoading(false)
       return
     }
+
     try {
-      await axios.post('/api/message/send', { text: input.trimEnd(), chatId })
+      await axios.post('/api/message/send', {
+        text: input.trimEnd(),
+        chatId
+      })
       setInput('')
       textareaRef.current?.focus()
     } catch (error) {
@@ -35,9 +42,26 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
       setIsLoading(false)
     }
   }
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+
+    if (e.target.files !== null) {
+      const url = await reader(e.target.files[0])
+
+      setImageUrl(url)
+    }
+  }
+
   return (
-    <div className='border-t border-gray-200 p-4 mb-2 sm:mb-0'>
-      <div className='relative flex-1 overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600'>
+    <div className='relative border-t border-gray-200 p-4 mb-2 flex sm:mb-0'>
+      {/* {imageUrl ? (
+        <Modal
+          imageUrl={imageUrl}
+          setImageUrl={setImageUrl}
+          sendMessage={sendMessage}
+        />
+      ) : null} */}
+      <div className='relative flex-1 overflow-hidden rounded-lg focus-within:ring-indigo-600'>
         <TextAreaAutosize
           ref={textareaRef}
           onKeyDown={(e) => {
@@ -59,15 +83,33 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
           className='py-2 '
           aria-hidden='true'>
           <div className='py-px'>
-            <div className='h-4' />
+            <div className='h-9' />
           </div>
         </div>
-        <div className='absolute right-0 bottom-0 flex justify-between py-2 pl-3 pr-2'>
-          <div className='flex shrink-0'>
-            <Button isLoading={isLoading} onClick={sendMessage} type='submit'>
-              Send
-            </Button>
-          </div>
+      </div>
+      <div className=' flex justify-between p-2'>
+        <div className='flex shrink-0  flex-col gap-y-2'>
+          <Button isLoading={isLoading} onClick={sendMessage} type='submit'>
+            {!isLoading ? <Send className='text-white h-6 w-6' /> : null}
+          </Button>
+          {/* <Button
+            isLoading={isLoading}
+            type='button'
+            className='p-0 flex items-center justify-center'>
+            <label
+              htmlFor='file-upload'
+              className=' flex  h-full w-full items-center justify-center'>
+              {!isLoading ? <ImagePlus className='text-white h-6 w-6' /> : null}
+              <input
+                id='file-upload'
+                name='files[]'
+                type='file'
+                accept='image/png, image/jpeg, image/jpg, image/svg'
+                className='hidden pointer-events-none'
+                onChange={handleImageUpload}
+              />
+            </label>
+          </Button> */}
         </div>
       </div>
     </div>

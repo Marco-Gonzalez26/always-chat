@@ -29,8 +29,6 @@ async function getChatMessages(chatId: string) {
       .reverse()
     const messages = messageArrayValidator.parse(dbMessages)
     return messages
-
-    //TODO display messages in reverse order
   } catch (error) {
     console.log(error)
     notFound()
@@ -52,7 +50,12 @@ const ChatWithIdPage = async ({ params }: ChatWithIdPageProps) => {
   }
 
   const chatPartnerId = user.id === userId1 ? userId2 : userId1
-  const chatPartner = (await db.get(`user:${chatPartnerId}`)) as User
+  const chatPartnerFromDb = (await fetchRedis(
+    'get',
+    `user:${chatPartnerId}`
+  )) as string
+  
+  const chatPartner = JSON.parse(chatPartnerFromDb) as User
   const initialMessages = await getChatMessages(chatId)
   return (
     <div className='flex-1 justify-between flex flex-col h-full max-h[calc(100vh-6rem)]'>

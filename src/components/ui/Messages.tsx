@@ -35,6 +35,7 @@ const Messages: FC<MessagesProps> = ({
     pusherClient.subscribe(toPusherKey(`chat:${chatId}`))
 
     const messageHandler = (message: Message) => {
+      console.log({ message })
       setMessages((prev) => [message, ...prev])
     }
 
@@ -44,7 +45,6 @@ const Messages: FC<MessagesProps> = ({
       pusherClient.unbind('incoming_message', messageHandler)
     }
   }, [chatId])
-
 
   return (
     <div
@@ -75,14 +75,24 @@ const Messages: FC<MessagesProps> = ({
                   }
                 )}>
                 <span
-                  className={classNames('px-4 py-2 rounded-lg inline-block', {
-                    'bg-indigo-600 text-white': isCurrentUser,
-                    'bg-gray-200 text-gray-900': !isCurrentUser,
-                    'rounded-br-none':
-                      !hasNextMessageFromSameUser && isCurrentUser,
-                    'rounded-bl-none':
-                      !hasNextMessageFromSameUser && !isCurrentUser
-                  })}>
+                  className={classNames(
+                    'px-4 py-2 rounded-lg inline-block max-w-xs',
+                    {
+                      'bg-indigo-600 text-white': isCurrentUser,
+                      'bg-gray-200 text-gray-900': !isCurrentUser,
+                      'rounded-br-none':
+                        !hasNextMessageFromSameUser && isCurrentUser,
+                      'rounded-bl-none':
+                        !hasNextMessageFromSameUser && !isCurrentUser
+                    }
+                  )}>
+                  {message.image && (
+                    <img
+                      src={message.image}
+                      alt={`Image from ${chatPartner.name}`}
+                      className='w-full rounded object-contain'
+                    />
+                  )}
                   {message.text}{' '}
                   <span
                     className={classNames('ml-2 text-xs', {
