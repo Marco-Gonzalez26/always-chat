@@ -5,7 +5,6 @@ export const messageValidator = z.object({
   senderId: z.string(),
   text: z.string().max(2000),
   timestamp: z.number(),
-  image: z.optional(z.string())
 })
 
 export const messageArrayValidator = z.array(messageValidator)

@@ -8,6 +8,7 @@ import { getServerSession } from 'next-auth'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+
 const Dashboard = async () => {
   const session = await getServerSession(authOptions)
 
@@ -17,28 +18,30 @@ const Dashboard = async () => {
 
   const friendsWithLastMessage = await Promise.all(
     friends.map(async (friend) => {
-      const [lastMessagefromDb] = (await fetchRedis(
+      const messagesFromDb = (await fetchRedis(
         'zrange',
         `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`,
         -1,
         -1
       )) as string[]
-      const lastMessage = JSON.parse(lastMessagefromDb) as Message
-
-      return { ...friend, lastMessage }
+      console.log({ messagesFromDb })
+      if (messagesFromDb.length !== 0) {
+        const lastMessage = JSON.parse(messagesFromDb[0]) as Message
+        return { ...friend, lastMessage }
+      }
     })
   )
-
+  console.log('length here => ', friendsWithLastMessage)
   return (
     <div className='container py-12'>
       <h1 className='font-bold text-5xl mb-8'>Recent chats</h1>
       {friendsWithLastMessage.length === 0 ? (
         <p className='text-zinc-500 text-sm'>Nothing to show here</p>
       ) : (
-        friendsWithLastMessage.map((friend) => {
+        friendsWithLastMessage.filter(friend => friend !== undefined).map((friend) => {
           return (
             <div
-              key={friend.id}
+              key={friend?.id}
               className='relative bg-zinc-50 border border-zinc-200 p-3 rounded-md'>
               <div className='absolute right-4 inset-y-0 flex items-center'>
                 <ChevronRight className='h-7 w-7 text-zinc-400' />
@@ -46,7 +49,7 @@ const Dashboard = async () => {
               <Link
                 href={`/dashboard/chat/${chatHrefConstructor(
                   session.user.id,
-                  friend.id
+                  friend?.id
                 )}`}
                 className='relative sm:flex'>
                 <div className='mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 items-center'>
@@ -54,22 +57,22 @@ const Dashboard = async () => {
                     <Image
                       referrerPolicy='no-referrer'
                       className='rounded-full'
-                      alt={`${friend.name} profile picture`}
+                      alt={`${friend?.name} profile picture`}
                       fill
-                      src={friend.image}
+                      src={friend?.image}
                     />
                   </div>
                 </div>
                 <div>
-                  <h4 className='text-lg font-semibold'>{friend.name}</h4>
+                  <h4 className='text-lg font-semibold'>{friend?.name}</h4>
                   <p className='mt-1 max-w-md'>
                     <span className='text-zinc-400'>
-                      {friend.lastMessage.senderId === session.user.id
+                      {friend?.lastMessage.senderId === session.user.id
                         ? 'You: '
                         : ''}
                     </span>
                     <span className='text-zinc-700 font-semibold'>
-                      {friend.lastMessage.text}
+                      {friend?.lastMessage.text}
                     </span>
                   </p>
                 </div>
