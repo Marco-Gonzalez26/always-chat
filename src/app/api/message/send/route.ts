@@ -9,7 +9,7 @@ import { User, getServerSession } from 'next-auth'
 
 export async function POST(req: Request) {
   try {
-    const { text, chatId, imageUrl } = await req.json()
+    const { text, chatId } = await req.json()
     const session = await getServerSession(authOptions)
 
     if (!session) return new Response('Unauthorized', { status: 401 })
@@ -38,8 +38,7 @@ export async function POST(req: Request) {
       id: nanoid(),
       senderId: session.user.id,
       text,
-      timestamp,
-      image: imageUrl
+      timestamp
     }
 
     const message = messageValidator.parse(messageData)

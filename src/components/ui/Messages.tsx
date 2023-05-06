@@ -35,7 +35,6 @@ const Messages: FC<MessagesProps> = ({
     pusherClient.subscribe(toPusherKey(`chat:${chatId}`))
 
     const messageHandler = (message: Message) => {
-      console.log({ message })
       setMessages((prev) => [message, ...prev])
     }
 
@@ -86,13 +85,6 @@ const Messages: FC<MessagesProps> = ({
                         !hasNextMessageFromSameUser && !isCurrentUser
                     }
                   )}>
-                  {message.image && (
-                    <img
-                      src={message.image}
-                      alt={`Image from ${chatPartner.name}`}
-                      className='w-full rounded object-contain'
-                    />
-                  )}
                   {message.text}{' '}
                   <span
                     className={classNames('ml-2 text-xs', {
