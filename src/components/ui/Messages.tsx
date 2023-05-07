@@ -86,6 +86,25 @@ const Messages: FC<MessagesProps> = ({
                     }
                   )}>
                   {message.text}{' '}
+                  {message.chatImage ? (
+                    <span
+                      className={classNames(
+                        'px-4 py-2 rounded-lg inline-block max-w-xs',
+                        {
+                          'bg-indigo-600 text-white': isCurrentUser,
+                          'bg-gray-200 text-gray-900': !isCurrentUser,
+                          'rounded-br-none':
+                            !hasNextMessageFromSameUser && isCurrentUser,
+                          'rounded-bl-none':
+                            !hasNextMessageFromSameUser && !isCurrentUser
+                        }
+                      )}>
+                      <img
+                        src={message?.chatImage}
+                        alt={`image from ${message.senderId}`}
+                      />
+                    </span>
+                  ) : null}
                   <span
                     className={classNames('ml-2 text-xs', {
                       'text-gray-400': !isCurrentUser,

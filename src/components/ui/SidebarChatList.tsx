@@ -1,12 +1,11 @@
 'use client'
-
+import { MessageCircle } from 'lucide-react'
 import { FC, useEffect, useState } from 'react'
 import { Message, User } from '@/types/db'
 import { usePathname, useRouter } from 'next/navigation'
 import { chatHrefConstructor, toPusherKey } from '@/lib/utils'
 import Image from 'next/image'
 import { pusherClient } from '@/lib/pusher'
-import path from 'path'
 import { toast } from 'react-hot-toast'
 import UnseenChatToast from './UnseenChatToast'
 

@@ -47,13 +47,13 @@ const Modal: FC<{
                     className='text-lg font-medium leading-6 text-gray-900'>
                     Upload Image
                   </Dialog.Title>
-                  <div className='mt-2 relative h-96 w-full'>
+                  <div className='mt-2 relative h-full w-full rounded'>
                     <Image
                       src={imageUrl}
                       alt='uploaded image'
                       fill
                       referrerPolicy='no-referrer'
-                      className='object-contain'
+                      className='object-contain rounded'
                     />
                   </div>
 

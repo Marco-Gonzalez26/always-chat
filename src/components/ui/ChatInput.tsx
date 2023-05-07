@@ -18,7 +18,7 @@ interface ChatInputProps {
 const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   const [input, setInput] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [imageUrl, setImageUrl] = useState<any>('')
+  const [imageUrl, setImageUrl] = useState<string | null>('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const sendMessage = async () => {
@@ -32,7 +32,8 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
     try {
       await axios.post('/api/message/send', {
         text: input.trimEnd(),
-        chatId
+        chatId,
+        chatImage: imageUrl
       })
       setInput('')
       textareaRef.current?.focus()
@@ -45,22 +46,35 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
 
-    if (e.target.files !== null) {
-      const url = await reader(e.target.files[0])
+    try {
+      const formData = new FormData()
 
-      setImageUrl(url)
+      if (e.target.files) formData.append('file', e.target.files[0])
+      formData.append('upload_preset', 'j6torjtd')
+      formData.append('cloud_name', 'djhxsufha')
+
+      const res = await axios.post(
+        'https://api.cloudinary.com/v1_1/djhxsufha/upload',
+        formData
+      )
+
+      setImageUrl(res.data.secure_url)
+    } catch (e) {
+      console.warn(e)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <div className='relative border-t border-gray-200 p-4 mb-2 flex sm:mb-0'>
-      {/* {imageUrl ? (
+      {imageUrl ? (
         <Modal
           imageUrl={imageUrl}
           setImageUrl={setImageUrl}
           sendMessage={sendMessage}
         />
-      ) : null} */}
+      ) : null}
       <div className='relative flex-1 overflow-hidden rounded-lg focus-within:ring-indigo-600'>
         <TextAreaAutosize
           ref={textareaRef}
@@ -92,7 +106,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
           <Button isLoading={isLoading} onClick={sendMessage} type='submit'>
             {!isLoading ? <Send className='text-white h-6 w-6' /> : null}
           </Button>
-          {/* <Button
+          <Button
             isLoading={isLoading}
             type='button'
             className='p-0 flex items-center justify-center'>
@@ -109,7 +123,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
                 onChange={handleImageUpload}
               />
             </label>
-          </Button> */}
+          </Button>
         </div>
       </div>
     </div>
