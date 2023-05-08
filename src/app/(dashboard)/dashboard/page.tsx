@@ -31,10 +31,9 @@ const Dashboard = async () => {
       }
     })
   )
-  console.log('length here => ', friendsWithLastMessage)
   return (
     <div className='container py-12'>
-      <h1 className='font-bold text-5xl mb-8'>Recent chats</h1>
+      <h1 className='font-bold text-2xl lg:text-5xl mb-8'>Recent chats</h1>
       {friendsWithLastMessage.length === 0 ? (
         <p className='text-zinc-500 text-sm'>Nothing to show here</p>
       ) : (
@@ -69,7 +68,7 @@ const Dashboard = async () => {
                   </div>
                   <div>
                     <h4 className='text-lg font-semibold'>{friend?.name}</h4>
-                    <p className='mt-1 max-w-md'>
+                    <p className='mt-1 max-w-md flex gap-x-1'>
                       <span className='text-zinc-400'>
                         {friend?.lastMessage.senderId === session.user.id
                           ? 'You: '
@@ -77,6 +76,23 @@ const Dashboard = async () => {
                       </span>
                       <span className='text-zinc-700 font-semibold'>
                         {friend?.lastMessage.text}
+                        {friend?.lastMessage.chatImage ? (
+                          <section className='flex gap-x-1'>
+                            <div className='relative w-6 h-6 rounded'>
+                              <Image
+                                src={friend.lastMessage.chatImage}
+                                className='w-4 blur-[0.5px]'
+                                alt={`Image from ${friend.name}`}
+                                referrerPolicy='no-referrer'
+                                fill
+                            
+                              />
+                            </div>
+                              <p>Image</p>
+                          </section>
+                        ) : (
+                          ''
+                        )}
                       </span>
                     </p>
                   </div>
