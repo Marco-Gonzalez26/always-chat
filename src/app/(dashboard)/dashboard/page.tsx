@@ -71,9 +71,9 @@ const Dashboard = async () => {
                       )}
                     </div>
                   </div>
-                  <h4 className='text-lg font-semibold'>{friend?.name}</h4>
-
                   <div>
+                    <h4 className='text-lg font-semibold'>{friend?.name}</h4>
+
                     <p className='mt-1 max-w-md flex gap-x-1'>
                       <span className='text-zinc-400'>
                         {friend?.lastMessage.senderId === session.user.id
