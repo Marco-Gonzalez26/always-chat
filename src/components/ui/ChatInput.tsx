@@ -94,10 +94,10 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
         />
         <div
           onClick={() => textareaRef.current?.focus()}
-          className='py-2 '
+          className='py-1 '
           aria-hidden='true'>
           <div className='py-px'>
-            <div className='h-9' />
+            <div className='h-4' />
           </div>
         </div>
       </div>
@@ -109,10 +109,10 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
           <Button
             isLoading={isLoading}
             type='button'
-            className='p-0 flex items-center justify-center'>
+            className=' flex items-center justify-center'>
             <label
               htmlFor='file-upload'
-              className=' flex  h-full w-full items-center justify-center'>
+              className=' flex h-full w-full items-center justify-center'>
               {!isLoading ? <ImagePlus className='text-white h-6 w-6' /> : null}
               <input
                 id='file-upload'
